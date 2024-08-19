@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "id": "examplemod",
+  "id": "blastin",
   "version": "${version}",
 
-  "name": "Example Mod",
-  "description": "This mod aims to help new BTA modders.",
+  "name": "BLASTIN!",
+  "description": "BLASTIN!!!!?!?",
   "authors": [
-    "Turnip Labs"
+    "StandardTacticalKnight"
   ],
   "contact": {
     "homepage": "",
@@ -19,24 +19,24 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-			"turniplabs.examplemod.ExampleMod"
+			"standardtacticalknight.blastin.Blastin"
     ],
 		"beforeGameStart": [
-			"turniplabs.examplemod.ExampleMod"
+			"standardtacticalknight.blastin.Blastin"
 		],
 		"afterGameStart": [
-			"turniplabs.examplemod.ExampleMod"
+			"standardtacticalknight.blastin.Blastin"
 		],
 		"recipesReady": [
-			"turniplabs.examplemod.ExampleMod"
+			"standardtacticalknight.blastin.Blastin"
 		]
 	},
   "mixins": [
-      "examplemod.mixins.json"
+		"blastin.mixins.json"
   ],
 
   "depends": {
-		"minecraft": "~7.1",
+		"minecraft": "^7.2-beta",
     "fabricloader": ">=0.15.5"
   },
   "suggests": {
