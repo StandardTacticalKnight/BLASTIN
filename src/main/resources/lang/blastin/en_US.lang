@@ -1,2 +1,6 @@
 tile.blastin.breachingcharge.name=Breaching Charge
 tile.blastin.breachingcharge.desc=Directional Explosive
+item.blastin.handcannon.blasting.name=Blasting Loaded Hand Cannon
+item.blastin.handcannon.blasting.desc=Armed and Ready!
+item.blastin.ammo.charge.blasting.name=Blasting Balls
+item.blastin.ammo.charge.blasting.desc=Explosive Blasting Balls That Can Destroy Terrain

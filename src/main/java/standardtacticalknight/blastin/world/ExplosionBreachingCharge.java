@@ -2,11 +2,16 @@ package standardtacticalknight.blastin.world;
 
 import net.minecraft.core.block.Block;
 import net.minecraft.core.entity.Entity;
+import net.minecraft.core.util.helper.DamageType;
 import net.minecraft.core.util.helper.MathHelper;
 import net.minecraft.core.util.helper.Side;
+import net.minecraft.core.util.phys.AABB;
+import net.minecraft.core.util.phys.Vec3d;
 import net.minecraft.core.world.Explosion;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.chunk.ChunkPosition;
+
+import java.util.ArrayList;
 
 public class ExplosionBreachingCharge extends Explosion {
 	private final Side side;
@@ -98,6 +103,36 @@ public class ExplosionBreachingCharge extends Explosion {
 					}
 				}
 			}
+		}
+	}
+	@Override
+	protected void damageEntities() {
+		float explosionSize2 = this.explosionSize * 0.3f;
+		int x1 = MathHelper.floor_double(this.explosionX - (double)explosionSize2 - 1.0);
+		int x2 = MathHelper.floor_double(this.explosionX + (double)explosionSize2 + 1.0);
+		int y1 = MathHelper.floor_double(this.explosionY - (double)explosionSize2 - 1.0);
+		int y2 = MathHelper.floor_double(this.explosionY + (double)explosionSize2 + 1.0);
+		int z1 = MathHelper.floor_double(this.explosionZ - (double)explosionSize2 - 1.0);
+		int z2 = MathHelper.floor_double(this.explosionZ + (double)explosionSize2 + 1.0);
+		ArrayList<Entity> list = new ArrayList<Entity>(this.worldObj.getEntitiesWithinAABBExcludingEntity(this.exploder, AABB.getBoundingBoxFromPool(x1, y1, z1, x2, y2, z2)));
+		Vec3d vec3d = Vec3d.createVector(this.explosionX, this.explosionY, this.explosionZ);
+		for (Entity entity : list) {
+			double d4 = entity.distanceTo(this.explosionX, this.explosionY, this.explosionZ) / (double)explosionSize2;
+			if (!(d4 <= 1.0)) continue;
+			double d6 = entity.x - this.explosionX;
+			double d8 = entity.y - this.explosionY;
+			double d10 = entity.z - this.explosionZ;
+			double d11 = MathHelper.sqrt_double(d6 * d6 + d8 * d8 + d10 * d10);
+			d6 /= d11;
+			d8 /= d11;
+			d10 /= d11;
+			double d12 = this.worldObj.func_675_a(vec3d, entity.bb);
+			double d13 = (1.0 - d4) * d12;
+			entity.hurt(this.exploder, (int)((d13 * d13 + d13) / 2.0 * 8.0 * (double)explosionSize2 + 1.0), DamageType.BLAST);
+			double d14 = d13;
+			entity.xd += d6 * d14;
+			entity.yd += d8 * d14;
+			entity.zd += d10 * d14;
 		}
 	}
 }

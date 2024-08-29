@@ -3,11 +3,17 @@ package standardtacticalknight.blastin;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.item.Item;
+import net.minecraft.core.item.ItemStack;
+import net.minecraft.core.item.tag.ItemTags;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import standardtacticalknight.blastin.block.BlockBreachingCharge;
+import standardtacticalknight.blastin.block.BlockLandMine;
 import standardtacticalknight.blastin.block.model.BlockModelBreachingCharge;
+import standardtacticalknight.blastin.block.model.BlockModelLandMine;
+import standardtacticalknight.blastin.item.ItemHandCannonBlastLoaded;
 import turniplabs.halplibe.helper.BlockBuilder;
+import turniplabs.halplibe.helper.ItemBuilder;
 import turniplabs.halplibe.helper.RecipeBuilder;
 import turniplabs.halplibe.util.GameStartEntrypoint;
 import turniplabs.halplibe.util.RecipeEntrypoint;
@@ -18,6 +24,11 @@ public class Blastin implements ModInitializer, GameStartEntrypoint, RecipeEntry
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
 	public static Block breachingCharge;
+	public static Block landMine;
+	public static Block incendiaryMine;
+	public static Block spiderMine;
+	public static Item ammoChargeExplosive;
+	public static Item itemHandCannonBlastLoaded;
     @Override
     public void onInitialize() {
         LOGGER.info("Blastin initialized.");
@@ -27,11 +38,34 @@ public class Blastin implements ModInitializer, GameStartEntrypoint, RecipeEntry
 	public void beforeGameStart() {
 		int startingBlockId = 2750;
 		int itemID = 18775;
+
+		ammoChargeExplosive = new ItemBuilder(MOD_ID)
+			.setIcon("blastin:item/breachingcharge")
+			.setStackSize(16)
+			.build(new Item("ammo.charge.blasting", itemID++));
+		itemHandCannonBlastLoaded = new ItemBuilder(MOD_ID)
+			.addTags(ItemTags.NOT_IN_CREATIVE_MENU)
+			.setIcon("minecraft:item/handcannon_loaded")
+			.build(new ItemHandCannonBlastLoaded("handcannon.blasting", itemID++));
+
+
 		breachingCharge = new BlockBuilder(MOD_ID)
 			.setTextures("minecraft:block/slate_side")
 			.setBlockModel(BlockModelBreachingCharge::new)
-			//.setIcon("blastin:item/breachingcharge")
 			.build(new BlockBreachingCharge("breachingcharge",startingBlockId++));
+		landMine = new BlockBuilder(MOD_ID)
+			.setTextures("minecraft:block/slate_side")
+			.setBlockModel(BlockModelLandMine::new)
+			.build(new BlockLandMine("landmine",startingBlockId++,false));
+		incendiaryMine = new BlockBuilder(MOD_ID)
+			.setTextures("minecraft:block/slate_side")
+			.setBlockModel(BlockModelLandMine::new)
+			.build(new BlockLandMine("incendiarymine",startingBlockId++,true));
+		spiderMine = new BlockBuilder(MOD_ID)
+			.setTextures("minecraft:block/slate_side")
+			.setBlockModel(BlockModelLandMine::new)
+			.build(new BlockLandMine("spidermine",startingBlockId++,true));
+
 
 	}
 
@@ -48,6 +82,12 @@ public class Blastin implements ModInitializer, GameStartEntrypoint, RecipeEntry
 			.addInput('B', Block.obsidian)
 			.addInput('S', Block.layerSlate)
 			.create("toBreachingCharge", breachingCharge.getDefaultStack());
+		RecipeBuilder.Shaped(MOD_ID)
+			.setShape(" S ", "BTB", " B ")
+			.addInput('T', Block.tnt)
+			.addInput('B', Item.ingotIron)
+			.addInput('S', Item.string)
+			.create("toBlasingBall", new ItemStack(ammoChargeExplosive,2));
 	}
 
 	@Override

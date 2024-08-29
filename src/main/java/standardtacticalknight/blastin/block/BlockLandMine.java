@@ -1,84 +1,89 @@
 package standardtacticalknight.blastin.block;
 
-import net.minecraft.core.block.BlockLever;
-import net.minecraft.core.entity.Entity;
+import net.minecraft.core.block.Block;
+import net.minecraft.core.block.BlockMotionSensor;
+import net.minecraft.core.block.BlockTileEntity;
+import net.minecraft.core.block.BlockTileEntityRotatable;
+import net.minecraft.core.block.entity.TileEntity;
+import net.minecraft.core.block.entity.TileEntitySensor;
+import net.minecraft.core.entity.EntityLiving;
 import net.minecraft.core.entity.player.EntityPlayer;
+import net.minecraft.core.enums.EnumDropCause;
 import net.minecraft.core.item.ItemFirestriker;
+import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.sound.SoundCategory;
 import net.minecraft.core.util.helper.Side;
-import net.minecraft.core.world.Explosion;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.WorldSource;
-import standardtacticalknight.blastin.world.ExplosionBreachingCharge;
+import standardtacticalknight.blastin.entity.TileEntityLandMine;
 
 import java.util.Random;
 
-public class BlockBreachingCharge extends BlockLever {
-	private static final float explosionSize = 4.0F;
+public class BlockLandMine extends BlockMotionSensor implements BlockLeverInterface {
+	public BlockLandMine(String key, int id, boolean b) {
+		super(key, id, b);
+	}
 	@Override
-	public int tickRate() {
-		return 40;
+	public boolean renderAsNormalBlock() {
+		return BlockLeverInterface.super.renderAsNormalBlock();
 	}
-	public BlockBreachingCharge(String key, int id) {
-		super(key, id);
+	@Override
+	public boolean isSolidRender() {
+		return BlockLeverInterface.super.isSolidRender();
 	}
+	@Override
+	public void onNeighborBlockChange(World world, int x, int y, int z, int blockId) {
+		BlockLeverInterface.super.onNeighborBlockChange(world,x,y,z,blockId);
+	}
+	@Override
+	public boolean canPlaceBlockOnSide(World world, int x, int y, int z, int side) {
+		return BlockLeverInterface.super.canPlaceBlockOnSide(world, x, y, z, side);
+	}
+	@Override
+	public void onBlockPlaced(World world, int x, int y, int z, Side side, EntityLiving entity, double sideHeight) {
+		BlockLeverInterface.super.onBlockPlaced(world, x, y, z, side, entity, sideHeight);
+	}
+
+	@Override
+	public boolean checkIfAttachedToBlock(World world, int i, int j, int k) {
+		return BlockLeverInterface.super.checkIfAttachedToBlock(world, i, j, k);
+	}
+	@Override
+	public void onBlockAdded(World world, int x, int y, int z) {
+		world.setBlockTileEntity(x, y, z, this.getNewBlockEntity());
+	}
+
 	@Override
 	public boolean onBlockRightClicked(World world, int x, int y, int z, EntityPlayer player, Side side, double xHit, double yHit) {
-
 		if (world.isClientSide) {
 			if (player != null && player.inventory.getCurrentItem() != null && player.inventory.getCurrentItem().getItem() instanceof ItemFirestriker) {
 				player.inventory.getCurrentItem().damageItem(1, player);
 			}
 			return true;
 		}
-
-		if (player != null && player.inventory.getCurrentItem() != null && player.inventory.getCurrentItem().getItem() instanceof ItemFirestriker) {
+		if (player != null) {
 			int metadata = world.getBlockMetadata(x, y, z);
 			int facing = metadata & 0b00001111; //first 4 bits face direction
 			int primed = 0b00010000 - (metadata & 0b00010000); //5th bit isPrimed
-
-			player.inventory.getCurrentItem().damageItem(1, player);
-			if(primed > 0) world.playSoundEffect(player, SoundCategory.WORLD_SOUNDS, (double)x + 0.5, (double)y + 0.5, (double)z + 0.5, "random.fuse", 1.0f, 0.1f);
 			world.setBlockMetadataWithNotify(x, y, z, facing + primed);
 			world.playSoundEffect(player, SoundCategory.WORLD_SOUNDS, (double)x + 0.5, (double)y + 0.5, (double)z + 0.5, "random.click", 0.3f, primed <= 0 ? 0.5f : 0.6f);
 			world.notifyBlocksOfNeighborChange(x, y, z, this.id);
-			world.scheduleBlockUpdate(x, y, z, this.id, this.tickRate());
 		}
 		return true;
 	}
 	@Override
-	public void updateTick(World world, int x, int y, int z, Random rand) {
-		if (world.isClientSide) {
-			return;
+	public ItemStack[] getBreakResult(World world, EnumDropCause dropCause, int x, int y, int z, int meta, TileEntity tileEntity) {
+		switch (dropCause) {
+			case WORLD:
+			case EXPLOSION:
+			case PROPER_TOOL:
+			case PICK_BLOCK:
+			case SILK_TOUCH: {
+				return new ItemStack[]{this.getDefaultStack()};
+			}
 		}
-		int blockMetadata = world.getBlockMetadata(x, y, z);
-		if ((blockMetadata & 16) == 0) {
-			return;
-		}
-		world.setBlockWithNotify(x, y, z, 0);
-		Side side = getSide(blockMetadata);
-		Explosion explosion = new ExplosionBreachingCharge(world, (Entity) null, (double)x+0.5f, (double)y+0.5f, (double)z+0.5f, explosionSize, side);
-		explosion.doExplosionA();
-		explosion.doExplosionB(true);
+		return null;
 	}
-
-	public static Side getSide(int meta) {
-		int side = meta & 0xF;
-		switch (side){
-			case 1:return Side.EAST;
-			case 2:return Side.WEST;
-			case 3:return Side.SOUTH;
-			case 4:return Side.NORTH;
-			case 5:
-			case 6:
-				return Side.TOP;
-			case 7:
-			case 8:
-				return Side.BOTTOM;
-		}
-        return Side.NONE;
-    }
-
 	@Override
 	public void setBlockBoundsBasedOnState(WorldSource world, int x, int y, int z) {
 		int face = world.getBlockMetadata(x, y, z) & 0xF;
@@ -103,20 +108,8 @@ public class BlockBreachingCharge extends BlockLever {
 			this.setBlockBounds(0.0, 0.5D - height, 0.5D - width, depth, 0.5D + height, 0.5D + width);
 		}
 	}
-
 	@Override
-	public boolean canProvidePower() {
-		return false;
-	}
-	@Override
-	public void onBlockRemoved(World world, int x, int y, int z, int data) {
-	}
-	@Override
-	public boolean isPoweringTo(WorldSource blockAccess, int x, int y, int z, int side) {
-		return false;
-	}
-	@Override
-	public boolean isIndirectlyPoweringTo(World world, int x, int y, int z, int side) {
-		return false;
+	protected TileEntity getNewBlockEntity() {
+		return new TileEntityLandMine();
 	}
 }

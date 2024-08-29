@@ -15,6 +15,7 @@ public class BlockModelBreachingCharge<T extends Block> extends BlockModelStanda
 	public BlockModelBreachingCharge(Block block) {
 		super(block);
 	}
+	@Override
 	public boolean render(Tessellator tessellator, int x, int y, int z) {
 		this.block.setBlockBoundsBasedOnState(renderBlocks.blockAccess, x, y, z);
 		int blockMetadata = renderBlocks.blockAccess.getBlockMetadata(x, y, z);
@@ -109,10 +110,12 @@ public class BlockModelBreachingCharge<T extends Block> extends BlockModelStanda
 		GL11.glTranslatef(0.5f, 0.0f, 0.5f);
 		this.block.setBlockBounds(0.0, 0.0, 0.0, 1.0, 1.0, 1.0);
 	}
+	@Override
 	public boolean shouldItemRender3d() {
 		return true;
 	}
 
+	@Override
 	public float getItemRenderScale() {
 		return 0.5F;
 	}
@@ -120,7 +123,7 @@ public class BlockModelBreachingCharge<T extends Block> extends BlockModelStanda
 	/**
 	 * Draw cuboid whose origin is centered on the middle of a given face
 	 */
-	private void calculateShape(double height, double width, double depth, int face){
+	void calculateShape(double height, double width, double depth, int face){
 		if (face == 7) {
 			this.block.setBlockBounds(0.5D - width, 1.0D - depth, 0.5D - height, 0.5D + width, 1.0, 0.5D + height);
 		} else if (face == 8) {
