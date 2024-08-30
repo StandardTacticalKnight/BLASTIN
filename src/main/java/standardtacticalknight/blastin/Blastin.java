@@ -56,17 +56,15 @@ public class Blastin implements ModInitializer, GameStartEntrypoint, RecipeEntry
 		landMine = new BlockBuilder(MOD_ID)
 			.setTextures("minecraft:block/slate_side")
 			.setBlockModel(BlockModelLandMine::new)
-			.build(new BlockLandMine("landmine",startingBlockId++,false));
+			.build(new BlockLandMine("landmine",startingBlockId++, BlockLandMine.Type.NORMAL));
 		incendiaryMine = new BlockBuilder(MOD_ID)
 			.setTextures("minecraft:block/slate_side")
 			.setBlockModel(BlockModelLandMine::new)
-			.build(new BlockLandMine("incendiarymine",startingBlockId++,true));
+			.build(new BlockLandMine("incendiarymine",startingBlockId++,BlockLandMine.Type.FIRE));
 		spiderMine = new BlockBuilder(MOD_ID)
 			.setTextures("minecraft:block/slate_side")
 			.setBlockModel(BlockModelLandMine::new)
-			.build(new BlockLandMine("spidermine",startingBlockId++,true));
-
-
+			.build(new BlockLandMine("spidermine",startingBlockId++,BlockLandMine.Type.WEB));
 	}
 
 	@Override

@@ -12,18 +12,35 @@ import net.minecraft.core.util.phys.AABB;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.WorldSource;
 
+import java.util.Random;
+
 
 public interface BlockLeverInterface {
 	public void onBlockRemoved(World world, int x, int y, int z, int data);
 	public boolean onBlockRightClicked(World world, int x, int y, int z, EntityPlayer player, Side side, double xPlaced, double yPlaced);
 	public void setBlockBoundsBasedOnState(WorldSource world, int x, int y, int z);
 	public void dropBlockWithCause(World world, EnumDropCause cause, int x, int y, int z, int meta, TileEntity tileEntity);
+	public void updateTick(World world, int x, int y, int z, Random rand);
+
+	/**
+	 * @return default: 40
+	 */
+	public int tickRate();
+	/**
+	 * @return default: false
+	 */
 	public default boolean renderAsNormalBlock() {
 		return false;
 	}
+	/**
+	 * @return default: false
+	 */
 	public default boolean isSolidRender() {
 		return false;
 	}
+	/**
+	 * @return default: null
+	 */
 	public default AABB getCollisionBoundingBoxFromPool(WorldSource world, int x, int y, int z) {
 		return null;
 	}

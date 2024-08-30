@@ -34,7 +34,7 @@ public class TileEntityLandMine extends TileEntity {
 		}
 		if (shouldBeActive && id == Blastin.landMine.id && (meta & 0b10000) == 0b10000) {
 			this.worldObj.playSoundEffect(null, SoundCategory.WORLD_SOUNDS, (double)this.x + 0.5, (double)this.y + 0.5, (double)this.z + 0.5, "random.breath", 0.5f, this.worldObj.rand.nextFloat());
-			//BlockMotionSensor.updateSensorBlockState(true, this.worldObj, this.x, this.y, this.z);
+			this.worldObj.scheduleBlockUpdate(this.x, this.y, this.z, id, 40);
 		}
 		if (!shouldBeActive && id == Blastin.landMine.id) {
 			//BlockMotionSensor.updateSensorBlockState(false, this.worldObj, this.x, this.y, this.z);
