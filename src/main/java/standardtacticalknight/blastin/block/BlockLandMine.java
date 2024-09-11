@@ -1,5 +1,6 @@
 package standardtacticalknight.blastin.block;
 
+import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockMotionSensor;
 import net.minecraft.core.block.entity.TileEntity;
 import net.minecraft.core.entity.Entity;
@@ -11,20 +12,18 @@ import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.sound.SoundCategory;
 import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.util.phys.AABB;
-import net.minecraft.core.world.Explosion;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.WorldSource;
+import standardtacticalknight.blastin.Blastin;
 import standardtacticalknight.blastin.entity.TileEntityLandMine;
 import standardtacticalknight.blastin.world.ExplosionBreachingCharge;
 
 import java.util.Random;
 
 public class BlockLandMine extends BlockMotionSensor implements BlockLeverInterface {
-	public enum Type {NORMAL,FIRE,WEB}
-	public final Type type;
-	public BlockLandMine(String key, int id, Type type) {
+
+	public BlockLandMine(String key, int id) {
 		super(key, id, false);
-		this.type = type;
 	}
 	@Override
 	public int tickRate() {
@@ -72,11 +71,17 @@ public class BlockLandMine extends BlockMotionSensor implements BlockLeverInterf
 		}
 		world.setBlockWithNotify(x, y, z, 0);
 		Side side = BlockLeverInterface.getSide(blockMetadata);
-		Explosion explosion = new ExplosionBreachingCharge(world, (Entity) null, (double)x+0.5f, (double)y+0.5f, (double)z+0.5f, 4.0f, side.getOpposite());
+		ExplosionBreachingCharge explosion = new ExplosionBreachingCharge(world, (Entity) null, (double)x+0.5f, (double)y+0.5f, (double)z+0.5f, 4.0f, side.getOpposite());
 		explosion.doExplosionA();
+		if (this.id == Blastin.incendiaryMine.id){
+			explosion.createBlocks(Block.fire);
+		}else if(this.id == Blastin.spiderMine.id){
+			explosion.createBlocks(Block.cobweb);
+		}
 		if (!world.isClientSide) {
 			world.playSoundEffect(null, SoundCategory.WORLD_SOUNDS, x,y,z, "random.explode", 4.0f, (1.0f + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.2f) * 0.7f);
 		}
+
 		world.spawnParticle("largesmoke", x,y,z, 0.0, 1.0, 0.0, 0);
 		world.spawnParticle("explode", x,y,z, 0.0, 1.0, 0.0, 0);
 		//world.spawnParticle("smoke", x,y,z, 0.0, 0.0, 0.0, 0);

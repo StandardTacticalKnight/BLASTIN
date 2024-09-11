@@ -9,7 +9,6 @@ import net.minecraft.core.util.helper.Direction;
 import net.minecraft.core.util.phys.AABB;
 import net.minecraft.core.world.World;
 import standardtacticalknight.blastin.Blastin;
-import standardtacticalknight.blastin.block.BlockLandMine;
 import standardtacticalknight.blastin.block.BlockLeverInterface;
 
 import java.util.List;
@@ -32,14 +31,12 @@ public class TileEntityLandMine extends TileEntity {
 				shouldBeActive = true;
 			}
 		}
-		if (shouldBeActive && id == Blastin.landMine.id && (meta & 0b10000) == 0b10000) {
+		if (shouldBeActive && (meta & 0b10000) == 0b10000) {
 			this.worldObj.playSoundEffect(null, SoundCategory.WORLD_SOUNDS, (double)this.x + 0.5, (double)this.y + 0.5, (double)this.z + 0.5, "random.breath", 0.5f, this.worldObj.rand.nextFloat());
 			this.worldObj.scheduleBlockUpdate(this.x, this.y, this.z, id, 40);
 		}
-		if (!shouldBeActive && id == Blastin.landMine.id) {
-			//BlockMotionSensor.updateSensorBlockState(false, this.worldObj, this.x, this.y, this.z);
-		}
-	}
+        //BlockMotionSensor.updateSensorBlockState(false, this.worldObj, this.x, this.y, this.z);
+    }
 
 	private int getSightRange(World world, int x, int y, int z, Direction facing) {
 		if (facing == Direction.NONE) {

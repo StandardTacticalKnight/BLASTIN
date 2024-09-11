@@ -3,7 +3,6 @@ package standardtacticalknight.blastin.world;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.entity.Entity;
 import net.minecraft.core.util.helper.DamageType;
-import net.minecraft.core.util.helper.Direction;
 import net.minecraft.core.util.helper.MathHelper;
 import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.util.phys.AABB;
@@ -111,7 +110,7 @@ public class ExplosionBreachingCharge extends Explosion {
 			default:
 				break;
 		}
-		ArrayList<Entity> list = new ArrayList<Entity>(this.worldObj.getEntitiesWithinAABBExcludingEntity(this.exploder, AABB.getBoundingBoxFromPool(x1, y1, z1, x2, y2, z2)));
+		ArrayList<Entity> list = new ArrayList<>(this.worldObj.getEntitiesWithinAABBExcludingEntity(this.exploder, AABB.getBoundingBoxFromPool(x1, y1, z1, x2, y2, z2)));
 		Vec3d vec3d = Vec3d.createVector(this.explosionX, this.explosionY, this.explosionZ);
 		for (Entity entity : list) {
 			double proximity = entity.distanceTo(this.explosionX, this.explosionY, this.explosionZ) / (double)explosionSize2;
@@ -126,10 +125,9 @@ public class ExplosionBreachingCharge extends Explosion {
 			double dampingFactor = this.worldObj.func_675_a(vec3d, entity.bb);//check for blocks between entity and explosion point
 			double damageMult = (1.0 - proximity) * dampingFactor; //ex: point-blank expl would be (1.0f - 0.0f) * 1.0f? || min damage/blocks in way would be (1.0f - 0.99f) * 0.0f?
 			entity.hurt(this.exploder, (int)((damageMult * damageMult + damageMult) / 2.0 * 8.0 * (double)explosionSize2 + 1.0), DamageType.BLAST);
-			double d14 = damageMult;
-			entity.xd += xDist * d14;
-			entity.yd += yDist * d14;
-			entity.zd += zDist * d14;
+            entity.xd += xDist * damageMult;
+			entity.yd += yDist * damageMult;
+			entity.zd += zDist * damageMult;
 		}
 	}
 	float[] calcExplosionMask(){
@@ -162,4 +160,15 @@ public class ExplosionBreachingCharge extends Explosion {
 		}
         return new float[]{xMask,yMask,zMask};
     }
+	public void createBlocks(Block block) {
+        ArrayList<ChunkPosition> arraylist = new ArrayList<>(this.destroyedBlockPositions);
+		for (int l2 = arraylist.size() - 1; l2 >= 0; --l2) {
+			ChunkPosition chunkposition = arraylist.get(l2);
+			int x1 = chunkposition.x;
+			int y1 = chunkposition.y;
+			int z1 = chunkposition.z;
+			if (this.worldObj.getBlockId(x1, y1, z1) != 0 || !Block.solid[this.worldObj.getBlockId(x1, y1 - 1, z1)] || this.ExplosionRNG.nextInt(3) != 0) continue;
+			this.worldObj.setBlockWithNotify(x1, y1, z1, block.id);
+		}
+	}
 }

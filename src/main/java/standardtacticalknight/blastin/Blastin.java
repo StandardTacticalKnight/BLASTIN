@@ -11,8 +11,10 @@ import standardtacticalknight.blastin.block.BlockBreachingCharge;
 import standardtacticalknight.blastin.block.BlockLandMine;
 import standardtacticalknight.blastin.block.model.BlockModelBreachingCharge;
 import standardtacticalknight.blastin.block.model.BlockModelLandMine;
+import standardtacticalknight.blastin.entity.TileEntityLandMine;
 import standardtacticalknight.blastin.item.ItemHandCannonBlastLoaded;
 import turniplabs.halplibe.helper.BlockBuilder;
+import turniplabs.halplibe.helper.EntityHelper;
 import turniplabs.halplibe.helper.ItemBuilder;
 import turniplabs.halplibe.helper.RecipeBuilder;
 import turniplabs.halplibe.util.GameStartEntrypoint;
@@ -39,6 +41,8 @@ public class Blastin implements ModInitializer, GameStartEntrypoint, RecipeEntry
 		int startingBlockId = 2750;
 		int itemID = 18775;
 
+		EntityHelper.createTileEntity(TileEntityLandMine.class, "LandMineTile");
+
 		ammoChargeExplosive = new ItemBuilder(MOD_ID)
 			.setIcon("blastin:item/breachingcharge")
 			.setStackSize(16)
@@ -55,16 +59,16 @@ public class Blastin implements ModInitializer, GameStartEntrypoint, RecipeEntry
 			.build(new BlockBreachingCharge("breachingcharge",startingBlockId++));
 		landMine = new BlockBuilder(MOD_ID)
 			.setTextures("minecraft:block/slate_side")
-			.setBlockModel(BlockModelLandMine::new)
-			.build(new BlockLandMine("landmine",startingBlockId++, BlockLandMine.Type.NORMAL));
+			.setBlockModel(block1 -> new BlockModelLandMine<>(block1, BlockModelLandMine.Type.NORMAL))
+			.build(new BlockLandMine("landmine",startingBlockId++));
 		incendiaryMine = new BlockBuilder(MOD_ID)
 			.setTextures("minecraft:block/slate_side")
-			.setBlockModel(BlockModelLandMine::new)
-			.build(new BlockLandMine("incendiarymine",startingBlockId++,BlockLandMine.Type.FIRE));
+			.setBlockModel(block -> new BlockModelLandMine<>(block,BlockModelLandMine.Type.FIRE))
+			.build(new BlockLandMine("incendiarymine",startingBlockId++));
 		spiderMine = new BlockBuilder(MOD_ID)
 			.setTextures("minecraft:block/slate_side")
-			.setBlockModel(BlockModelLandMine::new)
-			.build(new BlockLandMine("spidermine",startingBlockId++,BlockLandMine.Type.WEB));
+			.setBlockModel(block -> new BlockModelLandMine<>(block, BlockModelLandMine.Type.WEB))
+			.build(new BlockLandMine("spidermine",startingBlockId++));
 	}
 
 	@Override
