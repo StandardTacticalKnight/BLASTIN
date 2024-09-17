@@ -1,6 +1,8 @@
 package standardtacticalknight.blastin;
 
 import net.fabricmc.api.ModInitializer;
+import net.minecraft.client.render.item.model.ItemModelDoorPainted;
+import net.minecraft.client.render.item.model.ItemModelDye;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.item.Item;
 import net.minecraft.core.item.ItemStack;
@@ -13,6 +15,7 @@ import standardtacticalknight.blastin.block.model.BlockModelBreachingCharge;
 import standardtacticalknight.blastin.block.model.BlockModelLandMine;
 import standardtacticalknight.blastin.entity.TileEntityLandMine;
 import standardtacticalknight.blastin.item.ItemHandCannonBlastLoaded;
+import standardtacticalknight.blastin.item.model.ItemModelBlastBall;
 import turniplabs.halplibe.helper.BlockBuilder;
 import turniplabs.halplibe.helper.EntityHelper;
 import turniplabs.halplibe.helper.ItemBuilder;
@@ -44,7 +47,8 @@ public class Blastin implements ModInitializer, GameStartEntrypoint, RecipeEntry
 		EntityHelper.createTileEntity(TileEntityLandMine.class, "LandMineTile");
 
 		ammoChargeExplosive = new ItemBuilder(MOD_ID)
-			.setIcon("blastin:item/breachingcharge")
+			.setIcon("minecraft:item/ammo_charge_explosive")
+			.setItemModel(ItemModelBlastBall::new)
 			.setStackSize(16)
 			.build(new Item("ammo.charge.blasting", itemID++));
 		itemHandCannonBlastLoaded = new ItemBuilder(MOD_ID)

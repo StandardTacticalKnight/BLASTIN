@@ -27,7 +27,7 @@ public class BlockLandMine extends BlockMotionSensor implements BlockLeverInterf
 	}
 	@Override
 	public int tickRate() {
-		return 40;
+		return 10;
 	}
 	@Override
 	public boolean renderAsNormalBlock() {
