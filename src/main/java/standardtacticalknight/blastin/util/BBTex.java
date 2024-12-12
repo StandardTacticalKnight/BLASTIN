@@ -1,6 +1,6 @@
 package standardtacticalknight.blastin.util;
 
-import net.minecraft.client.render.stitcher.IconCoordinate;
+import net.minecraft.client.render.texture.stitcher.IconCoordinate;
 
 public class BBTex {
 	public double height;

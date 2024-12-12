@@ -1,12 +1,13 @@
 package standardtacticalknight.blastin;
 
 import net.fabricmc.api.ModInitializer;
-import net.minecraft.client.render.item.model.ItemModelDoorPainted;
-import net.minecraft.client.render.item.model.ItemModelDye;
 import net.minecraft.core.block.Block;
+import net.minecraft.core.block.Blocks;
 import net.minecraft.core.item.Item;
 import net.minecraft.core.item.ItemStack;
+import net.minecraft.core.item.Items;
 import net.minecraft.core.item.tag.ItemTags;
+import net.minecraft.core.util.collection.NamespaceID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import standardtacticalknight.blastin.block.BlockBreachingCharge;
@@ -22,6 +23,7 @@ import turniplabs.halplibe.helper.ItemBuilder;
 import turniplabs.halplibe.helper.RecipeBuilder;
 import turniplabs.halplibe.util.GameStartEntrypoint;
 import turniplabs.halplibe.util.RecipeEntrypoint;
+
 
 
 public class Blastin implements ModInitializer, GameStartEntrypoint, RecipeEntrypoint {
@@ -44,35 +46,37 @@ public class Blastin implements ModInitializer, GameStartEntrypoint, RecipeEntry
 		int startingBlockId = 2750;
 		int itemID = 18775;
 
-		EntityHelper.createTileEntity(TileEntityLandMine.class, "LandMineTile");
+		EntityHelper.createBlockEntity(TileEntityLandMine.class, "LandMineTile");
 
 		ammoChargeExplosive = new ItemBuilder(MOD_ID)
 			.setIcon("minecraft:item/ammo_charge_explosive")
 			.setItemModel(ItemModelBlastBall::new)
 			.setStackSize(16)
-			.build(new Item("ammo.charge.blasting", itemID++));
+			.setKey(MOD_ID+":blasting_balls")
+			.build(new Item(new NamespaceID(MOD_ID,"ammo.charge.blasting"), itemID++));
+
 		itemHandCannonBlastLoaded = new ItemBuilder(MOD_ID)
 			.addTags(ItemTags.NOT_IN_CREATIVE_MENU)
 			.setIcon("minecraft:item/handcannon_loaded")
-			.build(new ItemHandCannonBlastLoaded("handcannon.blasting", itemID++));
-
+			.setKey(MOD_ID+":handcannon_loaded")
+			.build(new ItemHandCannonBlastLoaded("handcannon.blasting",MOD_ID+":handcannon_loaded_blasting", itemID++));
 
 		breachingCharge = new BlockBuilder(MOD_ID)
 			.setTextures("minecraft:block/slate_side")
 			.setBlockModel(BlockModelBreachingCharge::new)
-			.build(new BlockBreachingCharge("breachingcharge",startingBlockId++));
+			.build("breachingcharge",MOD_ID+"breachingcharge",startingBlockId++, BlockBreachingCharge::new);
 		landMine = new BlockBuilder(MOD_ID)
 			.setTextures("minecraft:block/slate_side")
 			.setBlockModel(block1 -> new BlockModelLandMine<>(block1, BlockModelLandMine.Type.NORMAL))
-			.build(new BlockLandMine("landmine",startingBlockId++));
+			.build("landmine",MOD_ID+"landmine",startingBlockId++,BlockLandMine::new);
 		incendiaryMine = new BlockBuilder(MOD_ID)
 			.setTextures("minecraft:block/slate_side")
 			.setBlockModel(block -> new BlockModelLandMine<>(block,BlockModelLandMine.Type.FIRE))
-			.build(new BlockLandMine("incendiarymine",startingBlockId++));
+			.build("incendiarymine",MOD_ID+"incendiarymine",startingBlockId++, BlockLandMine::new);
 		spiderMine = new BlockBuilder(MOD_ID)
 			.setTextures("minecraft:block/slate_side")
 			.setBlockModel(block -> new BlockModelLandMine<>(block, BlockModelLandMine.Type.WEB))
-			.build(new BlockLandMine("spidermine",startingBlockId++));
+			.build("spidermine",MOD_ID+"spidermine",startingBlockId++,BlockLandMine::new);
 	}
 
 	@Override
@@ -84,20 +88,22 @@ public class Blastin implements ModInitializer, GameStartEntrypoint, RecipeEntry
 	public void onRecipesReady() {
 		RecipeBuilder.Shaped(MOD_ID)
 			.setShape("STS", "SBS", " S ")
-			.addInput('T', Block.tnt)
-			.addInput('B', Block.obsidian)
-			.addInput('S', Block.layerSlate)
+			.addInput('T', Blocks.TNT)
+			.addInput('B', Blocks.OBSIDIAN)
+			.addInput('S', Blocks.LAYER_SLATE)
 			.create("toBreachingCharge", breachingCharge.getDefaultStack());
 		RecipeBuilder.Shaped(MOD_ID)
 			.setShape(" S ", "BTB", " B ")
-			.addInput('T', Block.tnt)
-			.addInput('B', Item.ingotIron)
-			.addInput('S', Item.string)
+			.addInput('T', Blocks.TNT)
+			.addInput('B', Items.INGOT_IRON)
+			.addInput('S', Items.STRING)
 			.create("toBlasingBall", new ItemStack(ammoChargeExplosive,2));
 	}
 
 	@Override
 	public void initNamespaces() {
+		//DirectoryManager.registerKey(MOD_ID);
+		//DirectoryManager.refreshDirectories();
 		RecipeBuilder.initNameSpace(MOD_ID);
 	}
 }

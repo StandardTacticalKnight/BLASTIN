@@ -1,12 +1,13 @@
 package standardtacticalknight.blastin.world;
 
 import net.minecraft.core.block.Block;
+import net.minecraft.core.block.Blocks;
 import net.minecraft.core.entity.Entity;
 import net.minecraft.core.util.helper.DamageType;
 import net.minecraft.core.util.helper.MathHelper;
 import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.util.phys.AABB;
-import net.minecraft.core.util.phys.Vec3d;
+import net.minecraft.core.util.phys.Vec3;
 import net.minecraft.core.world.Explosion;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.chunk.ChunkPosition;
@@ -59,12 +60,13 @@ public class ExplosionBreachingCharge extends Explosion {
 
 					//look along the ray for blocks to destroy until power runs out
 					for (float boomPower = this.explosionSize * (0.7f + this.worldObj.rand.nextFloat() * 0.6f); !(boomPower <= 0.0f); boomPower -= travelRate * 0.75f) {
-						int iz = MathHelper.floor_double(z);
-						int iy = MathHelper.floor_double(y);
-						int ix = MathHelper.floor_double(x);
+						int iz = MathHelper.floor(z);
+						int iy = MathHelper.floor(y);
+						int ix = MathHelper.floor(x);
 						int blockId = this.worldObj.getBlockId(ix, iy, iz);
 						if (blockId > 0) {
-							boomPower -= (Block.blocksList[blockId].getBlastResistance(this.exploder) + 0.3f) * dissipationRate;
+                            assert Blocks.blocksList[blockId] != null;
+                            boomPower -= (Blocks.blocksList[blockId].getBlastResistance(this.exploder) + 0.3f) * dissipationRate;
 						}
 						if (boomPower > 0.0f) {
 							this.destroyedBlockPositions.add(new ChunkPosition(ix, iy, iz));
@@ -82,47 +84,47 @@ public class ExplosionBreachingCharge extends Explosion {
 	protected void damageEntities() {
 		float explosionSize2 = this.explosionSize * 2.0f;
 		float[] mask = calcExplosionMask();//smoosh explosion damage in direction on face
-		int x1 = MathHelper.floor_double(this.explosionX - (double)(explosionSize2 * mask[0]) - 1.0);
-		int x2 = MathHelper.floor_double(this.explosionX + (double)(explosionSize2 * mask[0]) + 1.0);
-		int y1 = MathHelper.floor_double(this.explosionY - (double)(explosionSize2 * mask[1]) - 1.0);
-		int y2 = MathHelper.floor_double(this.explosionY + (double)(explosionSize2 * mask[1]) + 1.0);
-		int z1 = MathHelper.floor_double(this.explosionZ - (double)(explosionSize2 * mask[2]) - 1.0);
-		int z2 = MathHelper.floor_double(this.explosionZ + (double)(explosionSize2 * mask[2]) + 1.0);
+		int x1 = MathHelper.floor(this.explosionX - (double)(explosionSize2 * mask[0]) - 1.0);
+		int x2 = MathHelper.floor(this.explosionX + (double)(explosionSize2 * mask[0]) + 1.0);
+		int y1 = MathHelper.floor(this.explosionY - (double)(explosionSize2 * mask[1]) - 1.0);
+		int y2 = MathHelper.floor(this.explosionY + (double)(explosionSize2 * mask[1]) + 1.0);
+		int z1 = MathHelper.floor(this.explosionZ - (double)(explosionSize2 * mask[2]) - 1.0);
+		int z2 = MathHelper.floor(this.explosionZ + (double)(explosionSize2 * mask[2]) + 1.0);
 		switch (side) {//don't hurt behind the mine
 			case BOTTOM:
-				y1 = MathHelper.floor_double(this.explosionY+0.5d);
+				y1 = MathHelper.floor(this.explosionY+0.5d);
 				break;
 			case TOP:
-				y2 = MathHelper.floor_double(this.explosionY-0.5d);
+				y2 = MathHelper.floor(this.explosionY-0.5d);
 				break;
 			case NORTH:
-				z1 = MathHelper.floor_double(this.explosionZ+0.5d);
+				z1 = MathHelper.floor(this.explosionZ+0.5d);
 				break;
 			case SOUTH:
-				z2 = MathHelper.floor_double(this.explosionZ-0.5d);
+				z2 = MathHelper.floor(this.explosionZ-0.5d);
 				break;
 			case WEST:
-				x1 = MathHelper.floor_double(this.explosionX+0.5d);
+				x1 = MathHelper.floor(this.explosionX+0.5d);
 				break;
 			case EAST:
-				x2 = MathHelper.floor_double(this.explosionX-0.5d);
+				x2 = MathHelper.floor(this.explosionX-0.5d);
 				break;
 			default:
 				break;
 		}
-		ArrayList<Entity> list = new ArrayList<>(this.worldObj.getEntitiesWithinAABBExcludingEntity(this.exploder, AABB.getBoundingBoxFromPool(x1, y1, z1, x2, y2, z2)));
-		Vec3d vec3d = Vec3d.createVector(this.explosionX, this.explosionY, this.explosionZ);
+		ArrayList<Entity> list = new ArrayList<>(this.worldObj.getEntitiesWithinAABBExcludingEntity(this.exploder, AABB.getTemporaryBB(x1, y1, z1, x2, y2, z2)));
+		Vec3 vec3d = Vec3.getTempVec3(this.explosionX, this.explosionY, this.explosionZ);
 		for (Entity entity : list) {
 			double proximity = entity.distanceTo(this.explosionX, this.explosionY, this.explosionZ) / (double)explosionSize2;
 			if (!(proximity <= 1.0)) continue;//distance must be less than 1 to damage entity.  0 is full damage 1 is no damage
 			double xDist = entity.x - this.explosionX;
 			double yDist = entity.y - this.explosionY;
 			double zDist = entity.z - this.explosionZ;
-			double distFromExpl2 = MathHelper.sqrt_double(xDist * xDist + yDist * yDist + zDist * zDist);
+			double distFromExpl2 = MathHelper.sqrt(xDist * xDist + yDist * yDist + zDist * zDist);
 			xDist /= distFromExpl2;//dist to ratio/component of dist
 			yDist /= distFromExpl2;
 			zDist /= distFromExpl2;
-			double dampingFactor = this.worldObj.func_675_a(vec3d, entity.bb);//check for blocks between entity and explosion point
+			double dampingFactor = this.worldObj.getSeenPercent(vec3d, entity.bb);//check for blocks between entity and explosion point
 			double damageMult = (1.0 - proximity) * dampingFactor; //ex: point-blank expl would be (1.0f - 0.0f) * 1.0f? || min damage/blocks in way would be (1.0f - 0.99f) * 0.0f?
 			entity.hurt(this.exploder, (int)((damageMult * damageMult + damageMult) / 2.0 * 8.0 * (double)explosionSize2 + 1.0), DamageType.BLAST);
             entity.xd += xDist * damageMult;
@@ -167,8 +169,8 @@ public class ExplosionBreachingCharge extends Explosion {
 			int x1 = chunkposition.x;
 			int y1 = chunkposition.y;
 			int z1 = chunkposition.z;
-			if (this.worldObj.getBlockId(x1, y1, z1) != 0 || !Block.solid[this.worldObj.getBlockId(x1, y1 - 1, z1)] || this.ExplosionRNG.nextInt(3) != 0) continue;
-			this.worldObj.setBlockWithNotify(x1, y1, z1, block.id);
+			if (this.worldObj.getBlockId(x1, y1, z1) != 0 || !Blocks.solid[this.worldObj.getBlockId(x1, y1 - 1, z1)] || this.ExplosionRNG.nextInt(3) != 0) continue;
+			this.worldObj.setBlockWithNotify(x1, y1, z1, block.id());
 		}
 	}
 }

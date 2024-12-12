@@ -1,13 +1,12 @@
 package standardtacticalknight.blastin.entity;
 
-import net.minecraft.core.HitResult;
-import net.minecraft.core.entity.EntityLiving;
-import net.minecraft.core.entity.projectile.EntityCannonball;
-import net.minecraft.core.entity.projectile.EntityCannonballBouncy;
+import net.minecraft.core.entity.Mob;
+import net.minecraft.core.entity.projectile.ProjectileCannonball;
+import net.minecraft.core.util.phys.HitResult;
 import net.minecraft.core.world.World;
 
-public class EntityBlastingCannonball extends EntityCannonball {
-	public EntityBlastingCannonball(World world, EntityLiving owner) {
+public class EntityBlastingCannonball extends ProjectileCannonball {
+	public EntityBlastingCannonball(World world, Mob owner) {
 		super(world, owner);
 	}
 	@Override

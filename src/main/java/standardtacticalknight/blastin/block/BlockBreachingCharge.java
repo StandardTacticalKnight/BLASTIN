@@ -1,11 +1,13 @@
 package standardtacticalknight.blastin.block;
 
-import net.minecraft.core.block.BlockLever;
+import net.minecraft.core.block.Block;
+import net.minecraft.core.block.BlockLogicLever;
 import net.minecraft.core.entity.Entity;
-import net.minecraft.core.entity.player.EntityPlayer;
-import net.minecraft.core.item.ItemFirestriker;
+import net.minecraft.core.entity.player.Player;
+import net.minecraft.core.item.ItemFireStriker;
 import net.minecraft.core.sound.SoundCategory;
 import net.minecraft.core.util.helper.Side;
+import net.minecraft.core.util.phys.AABB;
 import net.minecraft.core.world.Explosion;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.WorldSource;
@@ -13,26 +15,26 @@ import standardtacticalknight.blastin.world.ExplosionBreachingCharge;
 
 import java.util.Random;
 
-public class BlockBreachingCharge extends BlockLever {
+public class BlockBreachingCharge extends BlockLogicLever {
 	private static final float explosionSize = 4.0F;
 	@Override
-	public int tickRate() {
+	public int tickDelay() {
 		return 40;
 	}
-	public BlockBreachingCharge(String key, int id) {
-		super(key, id);
+	public BlockBreachingCharge(Block<?> block) {
+		super(block);
 	}
 	@Override
-	public boolean onBlockRightClicked(World world, int x, int y, int z, EntityPlayer player, Side side, double xHit, double yHit) {
+	public boolean onBlockRightClicked(World world, int x, int y, int z, Player player, Side side, double xHit, double yHit) {
 
 		if (world.isClientSide) {
-			if (player != null && player.inventory.getCurrentItem() != null && player.inventory.getCurrentItem().getItem() instanceof ItemFirestriker) {
+			if (player != null && player.inventory.getCurrentItem() != null && player.inventory.getCurrentItem().getItem() instanceof ItemFireStriker) {
 				player.inventory.getCurrentItem().damageItem(1, player);
 			}
 			return true;
 		}
 
-		if (player != null && player.inventory.getCurrentItem() != null && player.inventory.getCurrentItem().getItem() instanceof ItemFirestriker) {
+		if (player != null && player.inventory.getCurrentItem() != null && player.inventory.getCurrentItem().getItem() instanceof ItemFireStriker) {
 			int metadata = world.getBlockMetadata(x, y, z);
 			int facing = metadata & 0b00001111; //first 4 bits face direction
 			int primed = 0b00010000 - (metadata & 0b00010000); //5th bit isPrimed
@@ -41,8 +43,8 @@ public class BlockBreachingCharge extends BlockLever {
 			if(primed > 0) world.playSoundEffect(player, SoundCategory.WORLD_SOUNDS, (double)x + 0.5, (double)y + 0.5, (double)z + 0.5, "random.fuse", 1.0f, 0.1f);
 			world.setBlockMetadataWithNotify(x, y, z, facing + primed);
 			world.playSoundEffect(player, SoundCategory.WORLD_SOUNDS, (double)x + 0.5, (double)y + 0.5, (double)z + 0.5, "random.click", 0.3f, primed <= 0 ? 0.5f : 0.6f);
-			world.notifyBlocksOfNeighborChange(x, y, z, this.id);
-			world.scheduleBlockUpdate(x, y, z, this.id, this.tickRate());
+			world.notifyBlocksOfNeighborChange(x, y, z, this.id());
+			world.scheduleBlockUpdate(x, y, z, this.id(), this.tickDelay());
 		}
 		return true;
 	}
@@ -57,9 +59,9 @@ public class BlockBreachingCharge extends BlockLever {
 		}
 		world.setBlockWithNotify(x, y, z, 0);
 		Side side = getSide(blockMetadata);
-		Explosion explosion = new ExplosionBreachingCharge(world, (Entity) null, (double)x+0.5f, (double)y+0.5f, (double)z+0.5f, explosionSize, side);
-		explosion.doExplosionA();
-		explosion.doExplosionB(true);
+		Explosion explosion = new ExplosionBreachingCharge(world, null, (double)x+0.5f, (double)y+0.5f, (double)z+0.5f, explosionSize, side);
+		explosion.explode();
+		explosion.addEffects(true);
 	}
 
 	public static Side getSide(int meta) {
@@ -80,43 +82,46 @@ public class BlockBreachingCharge extends BlockLever {
     }
 
 	@Override
-	public void setBlockBoundsBasedOnState(WorldSource world, int x, int y, int z) {
+	public AABB getBlockBoundsFromState(WorldSource world, int x, int y, int z) {
 		int face = world.getBlockMetadata(x, y, z) & 0xF;
 		double height = 0.5d;
 		double width = 0.5d;
 		double depth = 0.25d;
 		if (face == 7) {
-			this.setBlockBounds(0.5D - width, 1.0D - depth, 0.5D - height, 0.5D + width, 1.0, 0.5D + height);
+			return AABB.getTemporaryBB(0.5D - width, 1.0D - depth, 0.5D - height, 0.5D + width, 1.0, 0.5D + height);
 		} else if (face == 8) {
-			this.setBlockBounds(0.5D - height, 1.0D - depth, 0.5D - width, 0.5D + height, 1.0, 0.5D + width);
+			return AABB.getTemporaryBB(0.5D - height, 1.0D - depth, 0.5D - width, 0.5D + height, 1.0, 0.5D + width);
 		} else if (face == 5) {
-			this.setBlockBounds(0.5D - width, 0.0, 0.5D - height, 0.5D + width, depth, 0.5D + height);
+			return AABB.getTemporaryBB(0.5D - width, 0.0, 0.5D - height, 0.5D + width, depth, 0.5D + height);
 		} else if (face == 6) {
-			this.setBlockBounds(0.5D - height, 0.0, 0.5D - width, 0.5D + height, depth, 0.5D + width);
+			return AABB.getTemporaryBB(0.5D - height, 0.0, 0.5D - width, 0.5D + height, depth, 0.5D + width);
 		} else if (face == 4) {
-			this.setBlockBounds(0.5D - width, 0.5D - height, 1.0D - depth, 0.5D + width, 0.5D + height, 1.0);
+			return AABB.getTemporaryBB(0.5D - width, 0.5D - height, 1.0D - depth, 0.5D + width, 0.5D + height, 1.0);
 		} else if (face == 3) {
-			this.setBlockBounds(0.5D - width, 0.5D - height, 0.0, 0.5D + width, 0.5D + height, depth);
+			return AABB.getTemporaryBB(0.5D - width, 0.5D - height, 0.0, 0.5D + width, 0.5D + height, depth);
 		} else if (face == 2) {
-			this.setBlockBounds(1.0D - depth, 0.5D - height, 0.5D - width, 1.0, 0.5D + height, 0.5D + width);
+			return AABB.getTemporaryBB(1.0D - depth, 0.5D - height, 0.5D - width, 1.0, 0.5D + height, 0.5D + width);
 		} else if (face == 1) {
-			this.setBlockBounds(0.0, 0.5D - height, 0.5D - width, depth, 0.5D + height, 0.5D + width);
+			return AABB.getTemporaryBB(0.0, 0.5D - height, 0.5D - width, depth, 0.5D + height, 0.5D + width);
 		}
+		return null;
 	}
 
 	@Override
-	public boolean canProvidePower() {
+	public boolean isSignalSource() {
 		return false;
 	}
 	@Override
 	public void onBlockRemoved(World world, int x, int y, int z, int data) {
 	}
+
 	@Override
-	public boolean isPoweringTo(WorldSource blockAccess, int x, int y, int z, int side) {
+	public boolean getSignal(WorldSource worldSource, int x, int y, int z, Side side) {
 		return false;
 	}
+
 	@Override
-	public boolean isIndirectlyPoweringTo(World world, int x, int y, int z, int side) {
+	public boolean getDirectSignal(World world, int x, int y, int z, Side side) {
 		return false;
 	}
 }

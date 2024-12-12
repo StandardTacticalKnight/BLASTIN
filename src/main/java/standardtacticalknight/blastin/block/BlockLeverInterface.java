@@ -1,8 +1,8 @@
 package standardtacticalknight.blastin.block;
 
 import net.minecraft.core.block.entity.TileEntity;
-import net.minecraft.core.entity.EntityLiving;
-import net.minecraft.core.entity.player.EntityPlayer;
+import net.minecraft.core.entity.Mob;
+import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.enums.EnumDropCause;
 import net.minecraft.core.item.Item;
 import net.minecraft.core.item.tag.ItemTags;
@@ -15,17 +15,17 @@ import net.minecraft.core.world.WorldSource;
 import java.util.Random;
 
 
-public interface BlockLeverInterface {
+public interface BlockLeverInterface{
 	public void onBlockRemoved(World world, int x, int y, int z, int data);
-	public boolean onBlockRightClicked(World world, int x, int y, int z, EntityPlayer player, Side side, double xPlaced, double yPlaced);
-	public void setBlockBoundsBasedOnState(WorldSource world, int x, int y, int z);
+	public boolean onBlockRightClicked(World world, int x, int y, int z, Player player, Side side, double xPlaced, double yPlaced);
+	public AABB getBlockBoundsFromState(WorldSource world, int x, int y, int z);
 	public void dropBlockWithCause(World world, EnumDropCause cause, int x, int y, int z, int meta, TileEntity tileEntity);
 	public void updateTick(World world, int x, int y, int z, Random rand);
 
 	/**
 	 * @return default: 40
 	 */
-	public int tickRate();
+	public int tickDelay();
 	/**
 	 * @return default: false
 	 */
@@ -44,7 +44,7 @@ public interface BlockLeverInterface {
 	public default AABB getCollisionBoundingBoxFromPool(WorldSource world, int x, int y, int z) {
 		return null;
 	}
-	public default void onBlockLeftClicked(World world, int x, int y, int z, EntityPlayer player, Side side, double xHit, double yHit) {
+	public default void onBlockLeftClicked(World world, int x, int y, int z, Player player, Side side, double xHit, double yHit) {
 		if (!Item.hasTag(player.getCurrentEquippedItem(), ItemTags.PREVENT_LEFT_CLICK_INTERACTIONS)) {
 			this.onBlockRightClicked(world, x, y, z, player, null, 0.0, 0.0);
 		}
@@ -86,7 +86,7 @@ public interface BlockLeverInterface {
 			}
 		}
 	}
-	public default void onBlockPlaced(World world, int x, int y, int z, Side side, EntityLiving entity, double sideHeight) {
+	public default void onBlockPlacedOnSide(World world, int x, int y, int z, Side side, Mob entity, double sideHeight) {
 		int i1 = world.getBlockMetadata(x, y, z);
 		int j1 = i1 & 0x10;
 		i1 &= 0xF;

@@ -1,6 +1,6 @@
 package standardtacticalknight.blastin.entity;
 
-import net.minecraft.core.block.Block;
+import net.minecraft.core.block.Blocks;
 import net.minecraft.core.block.entity.TileEntity;
 import net.minecraft.core.block.tag.BlockTags;
 import net.minecraft.core.entity.Entity;
@@ -8,7 +8,6 @@ import net.minecraft.core.sound.SoundCategory;
 import net.minecraft.core.util.helper.Direction;
 import net.minecraft.core.util.phys.AABB;
 import net.minecraft.core.world.World;
-import standardtacticalknight.blastin.Blastin;
 import standardtacticalknight.blastin.block.BlockLeverInterface;
 
 import java.util.List;
@@ -44,15 +43,13 @@ public class TileEntityLandMine extends TileEntity {
 		}
 		int range = 4;
 		int blockInFront = world.getBlockId(x + facing.getOffsetX(), y + facing.getOffsetY(), z + facing.getOffsetZ());
-		if (Block.hasTag(blockInFront, BlockTags.EXTENDS_MOTION_SENSOR_RANGE)) {
+		if (Blocks.hasTag(blockInFront, BlockTags.EXTENDS_MOTION_SENSOR_RANGE)) {
 			range = 8;
 		}
 		for (int i = 1; i <= range; ++i) {
-			int z1;
-			int y1;
-			int x1 = x + facing.getOffsetX() * i;
-			int id = world.getBlockId(x1, y1 = y + facing.getOffsetY() * i, z1 = z + facing.getOffsetZ() * i);
-			if (!Block.solid[id] || Block.hasTag(id, BlockTags.EXTENDS_MOTION_SENSOR_RANGE)) continue;
+            int x1 = x + facing.getOffsetX() * i;
+			int id = world.getBlockId(x1, y + facing.getOffsetY() * i, z + facing.getOffsetZ() * i);
+			if (!Blocks.solid[id] || Blocks.hasTag(id, BlockTags.EXTENDS_MOTION_SENSOR_RANGE)) continue;
 			return i - 1;
 		}
 		return range;
@@ -70,6 +67,6 @@ public class TileEntityLandMine extends TileEntity {
 		int maxX = Math.max(x1, x2) + 1;
 		int maxY = Math.max(y1, y2) + 1;
 		int maxZ = Math.max(z1, z2) + 1;
-		return AABB.getBoundingBoxFromPool(minX, minY, minZ, maxX, maxY, maxZ);
+		return AABB.getTemporaryBB(minX, minY, minZ, maxX, maxY, maxZ);
 	}
 }
