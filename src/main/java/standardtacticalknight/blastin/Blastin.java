@@ -4,6 +4,7 @@ import net.fabricmc.api.ModInitializer;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.Blocks;
 import net.minecraft.core.item.Item;
+import net.minecraft.core.item.ItemCoal;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.item.Items;
 import net.minecraft.core.item.tag.ItemTags;
@@ -15,6 +16,7 @@ import standardtacticalknight.blastin.block.BlockLandMine;
 import standardtacticalknight.blastin.block.model.BlockModelBreachingCharge;
 import standardtacticalknight.blastin.block.model.BlockModelLandMine;
 import standardtacticalknight.blastin.entity.TileEntityLandMine;
+import standardtacticalknight.blastin.item.ItemAmmo;
 import standardtacticalknight.blastin.item.ItemHandCannonBlastLoaded;
 import standardtacticalknight.blastin.item.model.ItemModelBlastBall;
 import turniplabs.halplibe.helper.BlockBuilder;
@@ -49,11 +51,13 @@ public class Blastin implements ModInitializer, GameStartEntrypoint, RecipeEntry
 		EntityHelper.createBlockEntity(TileEntityLandMine.class, "LandMineTile");
 
 		ammoChargeExplosive = new ItemBuilder(MOD_ID)
+			.addTags(ItemTags.NOT_IN_CREATIVE_MENU)
 			.setIcon("minecraft:item/ammo_charge_explosive")
 			.setItemModel(ItemModelBlastBall::new)
 			.setStackSize(16)
 			.setKey(MOD_ID+":blasting_balls")
-			.build(new Item(new NamespaceID(MOD_ID,"ammo.charge.blasting"), itemID++));
+			//.clone()
+			.build(new ItemAmmo("ammo.charge.blasting",MOD_ID+":blasting_balls", itemID++));//FIXME: This is a hack, find out why name no worky
 
 		itemHandCannonBlastLoaded = new ItemBuilder(MOD_ID)
 			.addTags(ItemTags.NOT_IN_CREATIVE_MENU)

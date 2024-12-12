@@ -106,7 +106,7 @@ public class BlockModelBreachingCharge<T extends BlockLogic> extends BlockModelS
 		}
 	}
 	void setBoundList(){
-		this.primedTexture = TextureRegistry.getTexture("minecraft:block/netherrack_igneous");
+		this.primedTexture = TextureRegistry.getTexture("minecraft:block/cobbled_netherrack_igneous_overlay");
 		//TextureRegistry.getTexture("minecraft:block/cake_inner")
 		list.add(new BBTex(0.5D,0.5D,0.0625D));
 		list.add(new BBTex(0.0625D,0.4375D,0.1875D));
