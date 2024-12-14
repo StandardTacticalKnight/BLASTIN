@@ -51,7 +51,7 @@ public class Blastin implements ModInitializer, GameStartEntrypoint, RecipeEntry
 		EntityHelper.createBlockEntity(TileEntityLandMine.class, "LandMineTile");
 
 		ammoChargeExplosive = new ItemBuilder(MOD_ID)
-			.addTags(ItemTags.NOT_IN_CREATIVE_MENU)
+			//.addTags(ItemTags.NOT_IN_CREATIVE_MENU)
 			.setIcon("minecraft:item/ammo_charge_explosive")
 			.setItemModel(ItemModelBlastBall::new)
 			.setStackSize(16)

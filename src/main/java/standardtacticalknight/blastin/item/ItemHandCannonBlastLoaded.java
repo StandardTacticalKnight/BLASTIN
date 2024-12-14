@@ -24,4 +24,9 @@ public class ItemHandCannonBlastLoaded extends ItemHandCannonLoaded {
 		}
 		return itemstack;
 	}
+
+	@Override
+	public String getLanguageKey(ItemStack itemstack) {
+		return  "item.blastin.handcannon.blasting";
+	}
 }

@@ -39,11 +39,11 @@ repositories {
 		url = 'https://maven.fabricmc.net/'
 	}
 	maven {
-		name = 'signalumMaven'
+		name = 'SignalumMavenInfrastructure'
 		url = 'https://maven.thesignalumproject.net/infrastructure'
 	}
 	maven {
-		name = 'signalumMaven'
+		name = 'SignalumMavenReleases'
 		url = 'https://maven.thesignalumproject.net/releases'
 	}
 	ivy {
@@ -77,11 +77,6 @@ repositories {
 			m2compatible = true
 		}
 		metadataSources { artifact() }
-	}
-	mavenLocal()
-	flatDir {
-		dirs "C:\\Users\\James\\IdeaProjects\\bta-halplibe\\build\\libs"
-
 	}
 
 }
@@ -126,7 +121,6 @@ dependencies {
 	implementation "org.lwjgl:lwjgl-openal:$lwjglVersion"
 	implementation "org.lwjgl:lwjgl-opengl:$lwjglVersion"
 	implementation "org.lwjgl:lwjgl-stb:$lwjglVersion"
-
 }
 
 java {
