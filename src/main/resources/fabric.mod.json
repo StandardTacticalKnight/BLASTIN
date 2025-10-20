@@ -29,8 +29,15 @@
 		],
 		"recipesReady": [
 			"standardtacticalknight.blastin.Blastin"
+		],
+		"initModels": [
+			"standardtacticalknight.blastin.Blastin"
+		],
+		"initItemModels": [
+			"standardtacticalknight.blastin.Blastin"
 		]
 	},
+
   "mixins": [
 		"blastin.mixins.json"
   ],

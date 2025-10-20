@@ -1,10 +1,15 @@
 package standardtacticalknight.blastin;
 
 import net.fabricmc.api.ModInitializer;
+import net.minecraft.client.render.EntityRenderDispatcher;
+import net.minecraft.client.render.TileEntityRenderDispatcher;
+import net.minecraft.client.render.block.color.BlockColorDispatcher;
+import net.minecraft.client.render.block.model.BlockModelDispatcher;
+import net.minecraft.client.render.item.model.ItemModelDispatcher;
+import net.minecraft.client.render.item.model.ItemModelStandard;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.Blocks;
 import net.minecraft.core.item.Item;
-import net.minecraft.core.item.ItemCoal;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.item.Items;
 import net.minecraft.core.item.tag.ItemTags;
@@ -19,41 +24,35 @@ import standardtacticalknight.blastin.entity.TileEntityLandMine;
 import standardtacticalknight.blastin.item.ItemAmmo;
 import standardtacticalknight.blastin.item.ItemHandCannonBlastLoaded;
 import standardtacticalknight.blastin.item.model.ItemModelBlastBall;
-import turniplabs.halplibe.helper.BlockBuilder;
-import turniplabs.halplibe.helper.EntityHelper;
-import turniplabs.halplibe.helper.ItemBuilder;
-import turniplabs.halplibe.helper.RecipeBuilder;
+import turniplabs.halplibe.helper.*;
+import turniplabs.halplibe.util.DirectoryManager;
 import turniplabs.halplibe.util.GameStartEntrypoint;
+import turniplabs.halplibe.util.ModelEntrypoint;
 import turniplabs.halplibe.util.RecipeEntrypoint;
 
 
 
-public class Blastin implements ModInitializer, GameStartEntrypoint, RecipeEntrypoint {
+public class Blastin implements ModInitializer, GameStartEntrypoint, RecipeEntrypoint, ModelEntrypoint {
     public static final String MOD_ID = "blastin";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-	public static Block breachingCharge;
-	public static Block landMine;
-	public static Block incendiaryMine;
-	public static Block spiderMine;
+	public static Block<BlockBreachingCharge> breachingCharge;
+	public static Block<BlockLandMine> landMine;
+	public static Block<BlockLandMine> incendiaryMine;
+	public static Block<BlockLandMine> spiderMine;
 	public static Item ammoChargeExplosive;
 	public static Item itemHandCannonBlastLoaded;
     @Override
     public void onInitialize() {
-        LOGGER.info("Blastin initialized.");
-    }
-
-	@Override
-	public void beforeGameStart() {
 		int startingBlockId = 2750;
 		int itemID = 18775;
 
-		EntityHelper.createBlockEntity(TileEntityLandMine.class, "LandMineTile");
+		EntityHelper.createTileEntity(TileEntityLandMine.class, NamespaceID.getPermanent(MOD_ID,"LandMineTile"));
 
 		ammoChargeExplosive = new ItemBuilder(MOD_ID)
 			//.addTags(ItemTags.NOT_IN_CREATIVE_MENU)
-			.setIcon("minecraft:item/ammo_charge_explosive")
-			.setItemModel(ItemModelBlastBall::new)
+			//.setIcon("minecraft:item/ammo_charge_explosive")
+			//.setItemModel(ItemModelBlastBall::new)
 			.setStackSize(16)
 			.setKey(MOD_ID+":blasting_balls")
 			//.clone()
@@ -61,26 +60,26 @@ public class Blastin implements ModInitializer, GameStartEntrypoint, RecipeEntry
 
 		itemHandCannonBlastLoaded = new ItemBuilder(MOD_ID)
 			.addTags(ItemTags.NOT_IN_CREATIVE_MENU)
-			.setIcon("minecraft:item/handcannon_loaded")
-			.setKey(MOD_ID+":handcannon_loaded")
+			.setKey("minecraft:item/handcannon_loaded")
+			//.setKey(MOD_ID+":handcannon_loaded")
 			.build(new ItemHandCannonBlastLoaded("handcannon.blasting",MOD_ID+":handcannon_loaded_blasting", itemID++));
 
 		breachingCharge = new BlockBuilder(MOD_ID)
-			.setTextures("minecraft:block/slate_side")
-			.setBlockModel(BlockModelBreachingCharge::new)
 			.build("breachingcharge",MOD_ID+"breachingcharge",startingBlockId++, BlockBreachingCharge::new);
 		landMine = new BlockBuilder(MOD_ID)
-			.setTextures("minecraft:block/slate_side")
-			.setBlockModel(block1 -> new BlockModelLandMine<>(block1, BlockModelLandMine.Type.NORMAL))
 			.build("landmine",MOD_ID+"landmine",startingBlockId++,BlockLandMine::new);
 		incendiaryMine = new BlockBuilder(MOD_ID)
-			.setTextures("minecraft:block/slate_side")
-			.setBlockModel(block -> new BlockModelLandMine<>(block,BlockModelLandMine.Type.FIRE))
 			.build("incendiarymine",MOD_ID+"incendiarymine",startingBlockId++, BlockLandMine::new);
 		spiderMine = new BlockBuilder(MOD_ID)
-			.setTextures("minecraft:block/slate_side")
-			.setBlockModel(block -> new BlockModelLandMine<>(block, BlockModelLandMine.Type.WEB))
 			.build("spidermine",MOD_ID+"spidermine",startingBlockId++,BlockLandMine::new);
+
+
+        LOGGER.info("Blastin initialized.");
+    }
+
+	@Override
+	public void beforeGameStart() {
+
 	}
 
 	@Override
@@ -106,8 +105,51 @@ public class Blastin implements ModInitializer, GameStartEntrypoint, RecipeEntry
 
 	@Override
 	public void initNamespaces() {
-		//DirectoryManager.registerKey(MOD_ID);
-		//DirectoryManager.refreshDirectories();
+		DirectoryManager.registerKey(MOD_ID);
+		DirectoryManager.refreshDirectories();
 		RecipeBuilder.initNameSpace(MOD_ID);
+	}
+
+	@Override
+	public void initBlockModels(BlockModelDispatcher dispatcher) {
+		try {
+			ModelHelper.setBlockModel(Blastin.breachingCharge, () -> new BlockModelBreachingCharge<>(Blastin.breachingCharge)
+				.setAllTextures(0, "minecraft:block/slate_side")
+			);
+			ModelHelper.setBlockModel(Blastin.landMine, () -> new BlockModelLandMine<>(Blastin.landMine, BlockModelLandMine.Type.NORMAL)
+				.setAllTextures(0, "minecraft:block/slate_side")
+			);
+			ModelHelper.setBlockModel(Blastin.incendiaryMine, () -> new BlockModelLandMine<>(Blastin.landMine, BlockModelLandMine.Type.FIRE)
+				.setAllTextures(0, "minecraft:block/slate_side")
+			);
+			ModelHelper.setBlockModel(Blastin.spiderMine, () -> new BlockModelLandMine<>(Blastin.landMine, BlockModelLandMine.Type.WEB)
+				.setAllTextures(0, "minecraft:block/slate_side")
+			);
+		} catch (Exception e) {
+
+			Blastin.LOGGER.error("Block Models failed to initialize.", e);
+		}
+		Blastin.LOGGER.info("Block Models initialized.");
+	}
+
+	@Override
+	public void initItemModels(ItemModelDispatcher dispatcher) {
+		ModelHelper.setItemModel(Blastin.ammoChargeExplosive, () -> new ItemModelBlastBall(Blastin.ammoChargeExplosive));
+		ModelHelper.setItemModel(Blastin.itemHandCannonBlastLoaded, () -> new ItemModelStandard(Items.HANDCANNON_LOADED,"minecraft"));
+	}
+
+	@Override
+	public void initEntityModels(EntityRenderDispatcher dispatcher) {
+
+	}
+
+	@Override
+	public void initTileEntityModels(TileEntityRenderDispatcher dispatcher) {
+
+	}
+
+	@Override
+	public void initBlockColors(BlockColorDispatcher dispatcher) {
+
 	}
 }

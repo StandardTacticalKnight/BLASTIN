@@ -12,7 +12,8 @@ public class EntityBlastingCannonball extends ProjectileCannonball {
 	@Override
 	public void onHit(HitResult hitResult) {
 		if (hitResult.hitType == HitResult.HitType.TILE) {
-			this.world.newExplosion(this.owner, this.x, this.y, this.z, 3f, false, false);
+            assert this.world != null;
+            this.world.createExplosion(this.owner, this.x, this.y, this.z, 3f, false, false);
 			this.remove();
 		}
 	}
